@@ -137,20 +137,24 @@ class Building {
     const floorButtonsWrapper = document.createElement("div");
     floorButtonsWrapper.classList.add("floor-buttons-wrapper");
 
-    const upButton = document.createElement("button");
-    upButton.classList.add("floor-button");
-    upButton.id = `up-button${floorNumber}`;
-    upButton.innerText = "^";
-    upButton.addEventListener("click", (e) => this.handleGoingUp(e));
+    if (floorNumber < this.floorCount - 1) {
+      const upButton = document.createElement("button");
+      upButton.classList.add("floor-button");
+      upButton.id = `up-button${floorNumber}`;
+      upButton.innerText = "^";
+      upButton.addEventListener("click", (e) => this.handleGoingUp(e));
+      floorButtonsWrapper.appendChild(upButton);
+    }
 
-    const downButton = document.createElement("button");
-    downButton.id = `down-button${floorNumber}`;
-    downButton.classList.add("floor-button");
-    downButton.innerText = "v";
-    downButton.addEventListener("click", (e) => this.handleGoingDown(e));
+    if (floorNumber > 0) {
+      const downButton = document.createElement("button");
+      downButton.id = `down-button${floorNumber}`;
+      downButton.classList.add("floor-button");
+      downButton.innerText = "v";
+      downButton.addEventListener("click", (e) => this.handleGoingDown(e));
+      floorButtonsWrapper.appendChild(downButton);
+    }
 
-    floorButtonsWrapper.appendChild(upButton);
-    floorButtonsWrapper.appendChild(downButton);
     floorControls.appendChild(floorButtonsWrapper);
     floorDiv.appendChild(floorControls);
 
@@ -179,8 +183,6 @@ class Building {
   }
 }
 
-// ... (keep the existing Lift and Building classes as they are)
-
 const generateButton = document.querySelector("#generate") as HTMLElement;
 const buildingContainer = document.querySelector(
   "#buildingContainer"
@@ -204,9 +206,7 @@ generateButton.addEventListener("click", () => {
     return;
   }
 
-  // Show the building container
   buildingContainer.style.display = "block";
 
-  // Generate the building
   new Building(floorCount, liftCount);
 });
