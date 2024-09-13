@@ -142,7 +142,7 @@ class Building {
       upButton.classList.add("floor-button");
       upButton.id = `up-button${floorNumber}`;
       upButton.innerText = "^";
-      upButton.addEventListener("click", (e) => this.handleGoingUp(e));
+      upButton.addEventListener("click", (e) => this.handleLiftRequest(e));
       floorButtonsWrapper.appendChild(upButton);
     }
 
@@ -151,7 +151,7 @@ class Building {
       downButton.id = `down-button${floorNumber}`;
       downButton.classList.add("floor-button");
       downButton.innerText = "v";
-      downButton.addEventListener("click", (e) => this.handleGoingDown(e));
+      downButton.addEventListener("click", (e) => this.handleLiftRequest(e));
       floorButtonsWrapper.appendChild(downButton);
     }
 
@@ -161,24 +161,32 @@ class Building {
     return floorDiv;
   }
 
-  handleGoingUp(e: Event): void {
-    this.handleLiftRequest(e);
-  }
-
-  handleGoingDown(e: Event): void {
-    this.handleLiftRequest(e);
-  }
-
   handleLiftRequest(e: Event): void {
     const requestingFloorDiv = (e.target as HTMLElement).parentNode!.parentNode!
       .parentNode as HTMLElement;
     const requestedFloorNo = parseInt(requestingFloorDiv.id.split("floor")[1]);
 
     for (const lift of this.lifts) {
-      if (!lift.isMoving) {
-        lift.moveToFloor(requestedFloorNo);
-        break;
+      if (lift.currentFloor === requestedFloorNo && lift.isMoving === false) {
+        return;
       }
+    }
+
+    let closestLift: Lift | null = null;
+    let minDistance = Infinity;
+
+    for (const lift of this.lifts) {
+      if (!lift.isMoving) {
+        const distance = Math.abs(lift.currentFloor - requestedFloorNo);
+        if (distance < minDistance) {
+          closestLift = lift;
+          minDistance = distance;
+        }
+      }
+    }
+
+    if (closestLift) {
+      closestLift.moveToFloor(requestedFloorNo);
     }
   }
 }
