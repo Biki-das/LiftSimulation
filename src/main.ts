@@ -35,6 +35,12 @@ class Lift {
   }
 
   moveToFloor(requestedFloorNo: number): void {
+    if (this.currentFloor === requestedFloorNo) {
+      // If the lift is already on the requested floor, just open and close the doors
+      this.openCloseDoors();
+      return;
+    }
+
     const numberOfFloorsTravelled = Math.abs(
       requestedFloorNo - this.currentFloor
     );
@@ -50,18 +56,22 @@ class Lift {
     this.liftElement.dataset.isMoving = "true";
 
     setTimeout(() => {
-      this.openDoors();
-      setTimeout(() => {
-        this.closeDoors();
-        setTimeout(() => {
-          this.isMoving = false;
-          this.liftElement.dataset.isMoving = "false";
-        }, 2500);
-      }, 2500);
+      this.openCloseDoors();
     }, liftTravelDuration);
 
     this.currentFloor = requestedFloorNo;
     this.liftElement.dataset.currentFloor = requestedFloorNo.toString();
+  }
+
+  openCloseDoors(): void {
+    this.openDoors();
+    setTimeout(() => {
+      this.closeDoors();
+      setTimeout(() => {
+        this.isMoving = false;
+        this.liftElement.dataset.isMoving = "false";
+      }, 2500);
+    }, 2500);
   }
 
   openDoors(): void {
@@ -168,6 +178,7 @@ class Building {
 
     for (const lift of this.lifts) {
       if (lift.currentFloor === requestedFloorNo && lift.isMoving === false) {
+        lift.openCloseDoors();
         return;
       }
     }
@@ -191,6 +202,7 @@ class Building {
   }
 }
 
+// Initialization code
 const generateButton = document.querySelector("#generate") as HTMLElement;
 const buildingContainer = document.querySelector(
   "#buildingContainer"
